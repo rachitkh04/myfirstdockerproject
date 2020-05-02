@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  dbos:
+    image: mysql:5.7
+    volumes: 
+      - mysql_storage_new:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_USER: rachit
+      MYSQL_PASSWORD: rachit                                  
+      MYSQL_DATABASE: mydb
+    networks:
+      - owncloud_network
+
+
+
+  ownos:
+    image: owncloud:latest
+    restart: always
+    depends_on: 
+      - dbos
+    ports:
+      - 4042:80
+    environment:
+      OWN_CLOUD_DB_HOST: dbos 
+      OWN_CLOUD_DB_USER: rachit
+      OWN_CLOUD_DB_PASSWORD: rachit
+      OWN_CLOUD_DB_NAME: mydb
+    volumes:
+      - owncloud_storage:/var/www/html
+    networks:
+      owncloud_network:
+        aliases:
+          - owncloudd  
+
+
+volumes:
+  owncloud_storage:
+  mysql_storage_new:
+
+networks:
+  owncloud_network:
+    driver: bridge
